@@ -1,5 +1,4 @@
 let buffer = "";
-let symbol = "";
 let stack = [];
 
 const display = document.querySelector(".display");
@@ -31,27 +30,40 @@ function handleNumber(value) {
 }
 
 function handleSymbol(value) {
-    console.log("handle symbol: ", value);
-    symbol = value;
-    switch (symbol) {
+    switch (value) {
         case "C":
-            display.innerText = "0"
+            display.innerText = "0";
             buffer = "";            
             stack = [];
             break;
         case "=":
             calc();
             break;
+        case "<-":
+            if (display.innerText.length === 1) {
+                display.innerText = "0";
+                buffer = "";
+            } else {
+                display.innerText = display.innerText.slice(0, -1);
+                buffer = display.innerText;
+                stack[stack.length-1] = buffer;
+            }
+            break;    
+        default:
+            if (stack.length == 1) {
+                stack.push(value);
+            } else {
+                calc();
+                stack.push(value);
+            }
         }
-    
-    stack.push(value);
 }
 
 function calc() {
     if (stack.length !== 3) {
         return;
     }
-    
+
     switch (stack[1]) {
         case "/":
             display.innerText = parseInt(stack[0]) / parseInt(stack[2]);
@@ -69,6 +81,7 @@ function calc() {
 
     buffer = "";
     stack = [];
+    stack.push(display.innerText);
 }
 
 function rerender() {
@@ -76,7 +89,6 @@ function rerender() {
 }
 
 function init() {
-    console.log("run init...");
     document.querySelector(".keypad-buttons").addEventListener("click", function(event) {
         buttonClick(event.target.innerText);
       });
